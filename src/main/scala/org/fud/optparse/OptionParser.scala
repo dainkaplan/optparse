@@ -425,6 +425,8 @@ class OptionParser {
     
     add_auto_help
 
+    if (args.isEmpty && switches.exists(s => s.requiresArg)) throw new NeedsArguments
+    
     val non_switch_args = new ListBuffer[String]
     argv.clear // Clear any remnants
     argv ++= args
@@ -481,7 +483,8 @@ class OptionParser {
     }
     arg_parsers = (m -> wrapped) :: arg_parsers
   }
-    
+  
+  protected class NeedsArguments extends OptionParserException("arguments are required.\n\n" + this.toString())
   protected class ArgumentMissing extends OptionParserException("argument missing: " + curr_arg_display)
   protected class InvalidArgument(m: String) extends OptionParserException("invalid argument: " + curr_arg_display + m) {
     def this(e: InvalidArgumentException) = this(if (e.getMessage.isEmpty) "" else "   (%s)".format(e.getMessage))
